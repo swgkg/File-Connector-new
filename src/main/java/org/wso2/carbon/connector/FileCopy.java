@@ -19,28 +19,45 @@ package org.wso2.carbon.connector;
 
 import java.io.File;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemOptions;
+import org.apache.commons.vfs.Selectors;
+import org.apache.commons.vfs.impl.StandardFileSystemManager;
 import org.apache.synapse.MessageContext;
 import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
 import org.wso2.carbon.connector.core.Connector;
+import org.wso2.carbon.connector.util.FTPSiteUtils;
 
 public class FileCopy extends AbstractConnector implements Connector {
 
+	private static Log log = LogFactory.getLog(FileCreate.class);
+
 	public void connect(MessageContext messageContext) throws ConnectException {
+
 		Object fileLocation = getParameter(messageContext, "filelocation");
 		Object filename = getParameter(messageContext, "file");
 		Object content = getParameter(messageContext, "content");
+		Object newFileLocation = getParameter(messageContext, "newfilelocation");
 		try {
 
-			System.out.println("File creation started..." + filename.toString());
-			System.out.println("File Location..." + fileLocation.toString());
-			System.out.println("File content..." + content.toString());
-
+			log.info("File creation started..." + filename.toString());
+			log.info("File Location..." + fileLocation.toString());
+			log.info("File content..." + content.toString());
+			StandardFileSystemManager manager = new StandardFileSystemManager();
+			String sftpURL = newFileLocation + filename.toString();
+			FileSystemOptions opts = FTPSiteUtils.createDefaultOptions();
 			File file = new File(fileLocation.toString(), filename.toString());
-			File newFile = new File("/home/gayan/", filename.toString());
-			FileUtils.copyFile(file, newFile);
+			manager.init();
+			FileObject localFile = manager.resolveFile(file.getAbsolutePath());
+			FileObject remoteFile = manager.resolveFile(sftpURL, opts);
+			remoteFile.copyFrom(localFile, Selectors.SELECT_SELF);
 
+			manager.close();
+
+			log.info("File copying completed..." + filename.toString());
 			// return dir;
 
 		} catch (Exception e) {

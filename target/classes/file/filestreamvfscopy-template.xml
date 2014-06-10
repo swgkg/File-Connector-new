@@ -1,17 +1,19 @@
-<template xmlns="http://ws.apache.org/ns/synapse" name="read">
+<template xmlns="http://ws.apache.org/ns/synapse" name="streamcopy">
     <parameter name="file"/>c
      <parameter name="filelocation"/>
       <parameter name="content"/>
-   <parameter name="ftpfilelocation"/>
+        <parameter name="newfilelocation"/>
+          
     <sequence>
         <log level="full">
             <property name="file" expression="$func:file" />  
             <property name="filelocation" expression="$func:filelocation" />
               <property name="content" expression="$func:content" />
-             <property name="ftpfilelocation" expression="$func:ftpfilelocation" />
-            
+                  <property name="newfilelocation" expression="$func:newfilelocation" />
+             
             
         </log>
-        <class name="org.wso2.carbon.connector.FileRead" />
+        <property name="buffersize" expression="200000" type="STRING" />
+        <class name="org.wso2.carbon.connector.FileCopyInStream" />
     </sequence>
 </template>

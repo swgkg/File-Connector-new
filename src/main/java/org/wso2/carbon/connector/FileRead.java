@@ -17,10 +17,14 @@
  */
 package org.wso2.carbon.connector;
 
-import java.io.File;
-import java.util.Arrays;
+import java.io.IOException;
+import java.io.InputStream;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileSystemManager;
+import org.apache.commons.vfs.VFS;
+import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.synapse.MessageContext;
 import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
@@ -29,25 +33,61 @@ import org.wso2.carbon.connector.core.Connector;
 public class FileRead extends AbstractConnector implements Connector {
 
 	public void connect(MessageContext messageContext) throws ConnectException {
-		Object fileLocation = getParameter(messageContext, "filelocation");
-		Object filename = getParameter(messageContext, "file");
-		Object content = getParameter(messageContext, "content");
+		String filename =
+		                  getParameter(messageContext, "file") == null
+		                                                              ? ""
+		                                                              : getParameter(
+		                                                                             messageContext,
+		                                                                             "file").toString();
+		String content =
+		                 getParameter(messageContext, "content") == null
+		                                                                ? ""
+		                                                                : getParameter(
+		                                                                               messageContext,
+		                                                                               "content").toString();
+		String ftpFileLocation =
+		                         getParameter(messageContext, "ftpfilelocation") == null
+		                                                                                ? ""
+		                                                                                : getParameter(
+		                                                                                               messageContext,
+		                                                                                               "ftpfilelocation").toString();
+		log.info("File append start with" + filename.toString());
+
+		FileSystemManager fsManager;
+
+		InputStream in = null;
+
 		try {
+			fsManager = VFS.getManager();
+			if (fsManager != null) {
 
-			System.out.println("File creation started..." + filename.toString());
-			System.out.println("File Location..." + fileLocation.toString());
-			System.out.println("File content..." + content.toString());
+				FileObject fileObj = fsManager.resolveFile(ftpFileLocation + filename);
 
-			File file = new File(fileLocation.toString(), filename.toString());
-			File newFile = new File("/home/gayan/", filename.toString());
-			byte[] buf = FileUtils.readFileToByteArray(file);
-			System.out.println("Reading contents form file : " + Arrays.toString(buf));
-			String str = FileUtils.readFileToString(newFile, "US_ASCII");
-			System.out.println("Reading contents form file : " + str);
-			// return dir;
+				// if the file does not exist, this method creates it, and the
+				// parent folder, if necessary
+				// if the file does exist, it appends whatever is written to the
+				// output stream
+				in = fileObj.getContent().getInputStream();
+				int length;
+				while ((length = in.read()) != -1) {
 
-		} catch (Exception e) {
-			throw new ConnectException(e);
+					// convert to char and display it
+					System.out.print((char) length);
+				}
+
+				if (fileObj != null) {
+					fileObj.close();
+				}
+				((DefaultFileSystemManager) fsManager).close();
+			}
+
+		} catch (FileSystemException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+
 		}
 	}
 }

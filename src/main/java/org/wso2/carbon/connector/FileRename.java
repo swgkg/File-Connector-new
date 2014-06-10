@@ -17,13 +17,15 @@
  */
 package org.wso2.carbon.connector;
 
-import java.io.File;
-
-import org.apache.commons.io.FileUtils;
+import org.apache.axiom.om.OMElement;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.impl.StandardFileSystemManager;
 import org.apache.synapse.MessageContext;
 import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
 import org.wso2.carbon.connector.core.Connector;
+import org.wso2.carbon.connector.util.FTPSiteUtils;
+import org.wso2.carbon.connector.util.ResultPayloadCreater;
 
 public class FileRename extends AbstractConnector implements Connector {
 
@@ -38,14 +40,34 @@ public class FileRename extends AbstractConnector implements Connector {
 			System.out.println("File Location..." + fileLocation.toString());
 			System.out.println("File content..." + content.toString());
 
-			File file = new File(fileLocation.toString(), filename.toString());
+			StandardFileSystemManager manager = new StandardFileSystemManager();
 
-			File renameFile = new File(fileLocation.toString(), newFileName.toString());
-			boolean isRenamed = file.renameTo(renameFile);
-			if (isRenamed) {
-				FileUtils.touch(renameFile);
+			try {
+				manager.init();
+
+				// Create remote object
+				FileObject remoteFile =
+				                        manager.resolveFile(fileLocation.toString() +
+				                                                    filename.toString(),
+				                                            FTPSiteUtils.createDefaultOptions());
+
+				FileObject reNameFile =
+				                        manager.resolveFile(fileLocation.toString() +
+				                                                    newFileName.toString(),
+				                                            FTPSiteUtils.createDefaultOptions());
+				if (remoteFile.exists()) {
+					remoteFile.moveTo(reNameFile);
+					ResultPayloadCreater resultPayload = new ResultPayloadCreater();
+					String responce = "<result>Suceess</result>";
+					OMElement element = resultPayload.performSearchMessages(responce);
+					resultPayload.preparePayload(messageContext, element);
+					log.info("Rename remote file success");
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			} finally {
+				manager.close();
 			}
-
 			// return dir;
 
 		} catch (Exception e) {

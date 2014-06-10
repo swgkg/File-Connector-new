@@ -17,35 +17,69 @@
  */
 package org.wso2.carbon.connector;
 
-import java.io.File;
-
-import org.apache.commons.io.FileUtils;
+import org.apache.axiom.om.OMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.impl.StandardFileSystemManager;
 import org.apache.synapse.MessageContext;
 import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
 import org.wso2.carbon.connector.core.Connector;
+import org.wso2.carbon.connector.util.FTPSiteUtils;
+import org.wso2.carbon.connector.util.ResultPayloadCreater;
 
+/**
+ * 
+ * @author gayan
+ * 
+ */
 public class FileDelete extends AbstractConnector implements Connector {
 
+	private static Log log = LogFactory.getLog(FileCreate.class);
+
 	public void connect(MessageContext messageContext) throws ConnectException {
-		Object fileLocation = getParameter(messageContext, "filelocation");
-		Object filename = getParameter(messageContext, "file");
-		Object content = getParameter(messageContext, "content");
-		Boolean isAFolder = false;
+		String fileLocation =
+		                      getParameter(messageContext, "filelocation") == null
+		                                                                          ? ""
+		                                                                          : getParameter(
+		                                                                                         messageContext,
+		                                                                                         "filelocation").toString();
+		String filename =
+		                  getParameter(messageContext, "file") == null
+		                                                              ? ""
+		                                                              : getParameter(
+		                                                                             messageContext,
+		                                                                             "file").toString();
+
 		try {
 
-			System.out.println("File creation started..." + filename.toString());
-			System.out.println("File Location..." + fileLocation.toString());
-			System.out.println("File content..." + content.toString());
+			log.info("File deletion started..." + filename.toString());
+			log.info("File Location..." + fileLocation);
 
-			File file = new File(fileLocation.toString(), filename.toString());
-			if (isAFolder) {
-				FileUtils.deleteDirectory(file);
-			} else {
-				FileUtils.forceDelete(file);
+			StandardFileSystemManager manager = new StandardFileSystemManager();
+
+			try {
+				manager.init();
+
+				// Create remote object
+				FileObject remoteFile =
+				                        manager.resolveFile(fileLocation + filename,
+				                                            FTPSiteUtils.createDefaultOptions());
+
+				if (remoteFile.exists()) {
+					remoteFile.delete();
+					ResultPayloadCreater resultPayload = new ResultPayloadCreater();
+					String responce = "<result>Suceess</result>";
+					OMElement element = resultPayload.performSearchMessages(responce);
+					resultPayload.preparePayload(messageContext, element);
+					log.info("Delete remote file success");
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			} finally {
+				manager.close();
 			}
-
-			// return dir;
 
 		} catch (Exception e) {
 			throw new ConnectException(e);

@@ -27,15 +27,19 @@
         </component>
            <component name="append">
             <file>fileappend-template.xml</file>
-            <description>File Delete</description>
+            <description>File Append</description>
         </component>
           <component name="archives">
             <file>filearchives-template.xml</file>
-            <description>File Delete</description>
+            <description>File Archive</description>
         </component>
-          <component name="search">
+        <component name="search">
             <file>filesearch-template.xml</file>
-            <description>File Delete</description>
+            <description>File Search</description>
+        </component>
+        <component name="streamcopy">
+            <file>filestreamcopy-template.xml</file>
+            <description>File streaming</description>
         </component>
     </subComponents>
 </component>
