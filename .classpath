@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry excluding="**/*.java" kind="src" path="src/main/resources"/>
 	<classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.3/servlet-api-2.3.jar"/>
@@ -187,7 +188,6 @@
 	<classpathentry kind="var" path="M2_REPO/oro/oro/2.0.8/oro-2.0.8.jar" sourcepath="M2_REPO/oro/oro/2.0.8/oro-2.0.8-sources.jar"/>
 	<classpathentry kind="lib" path="/home/gayan/workspace/File-connector-vfs/Repository/Jar lib/synapse-commons-2.1.2-wso2v4.jar"/>
 	<classpathentry kind="lib" path="/home/gayan/workspace/File-connector-vfs/Repository/Jar lib/synapse-core-2.1.0.jar"/>
-	<classpathentry kind="lib" path="/home/gayan/workspace/File-connector-vfs/Repository/Jar lib/synapse-core-1.2.jar"/>
 	<classpathentry kind="lib" path="/home/gayan/workspace/File-connector-vfs/Repository/Jar lib/synapse-commons-2.1.0.jar"/>
 	<classpathentry kind="lib" path="/home/gayan/workspace/File-connector-vfs/Repository/Jar lib/org.wso2.carbon.connector.core-4.2.0.jar"/>
 	<classpathentry kind="lib" path="/home/gayan/workspace/File-connector-vfs/Repository/Jar lib/org.apache.commons.logging-1.1.1.jar"/>
@@ -201,5 +201,6 @@
 	<classpathentry kind="lib" path="/home/gayan/workspace/File-connector-vfs/Repository/Jar lib/axis2-kernel-1.6.2.jar"/>
 	<classpathentry kind="lib" path="/home/gayan/workspace/File-connector-vfs/Repository/Jar lib/axiom-dom-1.2.13.jar"/>
 	<classpathentry kind="lib" path="/home/gayan/workspace/File-connector-vfs/Repository/Jar lib/axiom-api-1.2.13.jar"/>
+	<classpathentry kind="lib" path="/home/gayan/workspace/File-connector-vfs/Repository/Jar lib/testng-6.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

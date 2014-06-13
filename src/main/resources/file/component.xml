@@ -41,6 +41,14 @@
             <file>filestreamcopy-template.xml</file>
             <description>File streaming</description>
         </component>
+         <component name="vfsstreamcopy">
+            <file>filestreamvfscopy-template.xml</file>
+            <description>File streaming</description>
+        </component>
+           <component name="isfileexist">
+            <file>fileexists-template.xml</file>
+            <description>File streaming</description>
+        </component>
     </subComponents>
 </component>
 

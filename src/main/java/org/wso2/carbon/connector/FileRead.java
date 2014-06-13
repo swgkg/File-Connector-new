@@ -20,15 +20,21 @@ package org.wso2.carbon.connector;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.stream.XMLStreamException;
+
+import org.apache.axiom.om.OMElement;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemManager;
 import org.apache.commons.vfs.VFS;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.synapse.MessageContext;
+import org.codehaus.jettison.json.JSONException;
 import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
 import org.wso2.carbon.connector.core.Connector;
+import org.wso2.carbon.connector.util.ResultPayloadCreater;
 
 public class FileRead extends AbstractConnector implements Connector {
 
@@ -51,6 +57,13 @@ public class FileRead extends AbstractConnector implements Connector {
 		                                                                                : getParameter(
 		                                                                                               messageContext,
 		                                                                                               "ftpfilelocation").toString();
+
+		String encoding =
+		                  getParameter(messageContext, "encoding") == null
+		                                                                  ? ""
+		                                                                  : getParameter(
+		                                                                                 messageContext,
+		                                                                                 "encoding").toString();
 		log.info("File append start with" + filename.toString());
 
 		FileSystemManager fsManager;
@@ -68,6 +81,9 @@ public class FileRead extends AbstractConnector implements Connector {
 				// if the file does exist, it appends whatever is written to the
 				// output stream
 				in = fileObj.getContent().getInputStream();
+
+				String str = "<result>" + IOUtils.toString(in, encoding) + "</result>";
+
 				int length;
 				while ((length = in.read()) != -1) {
 
@@ -79,11 +95,22 @@ public class FileRead extends AbstractConnector implements Connector {
 					fileObj.close();
 				}
 				((DefaultFileSystemManager) fsManager).close();
+				ResultPayloadCreater resultPayload = new ResultPayloadCreater();
+
+				OMElement element = resultPayload.performSearchMessages(str);
+				resultPayload.preparePayload(messageContext, element);
+
 			}
 
 		} catch (FileSystemException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (XMLStreamException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {

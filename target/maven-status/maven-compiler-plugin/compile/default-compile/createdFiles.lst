@@ -1,4 +1,5 @@
 org/wso2/carbon/connector/FileCompressUtil$1.class
+org/wso2/carbon/connector/FileExist.class
 org/wso2/carbon/connector/FileSearch$1.class
 org/wso2/carbon/connector/FileDelete.class
 org/wso2/carbon/connector/util/FTPSiteUtils.class

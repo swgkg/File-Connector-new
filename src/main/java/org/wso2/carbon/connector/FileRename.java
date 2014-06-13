@@ -19,6 +19,7 @@ package org.wso2.carbon.connector;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.impl.StandardFileSystemManager;
 import org.apache.synapse.MessageContext;
 import org.wso2.carbon.connector.core.AbstractConnector;
@@ -30,10 +31,38 @@ import org.wso2.carbon.connector.util.ResultPayloadCreater;
 public class FileRename extends AbstractConnector implements Connector {
 
 	public void connect(MessageContext messageContext) throws ConnectException {
-		Object fileLocation = getParameter(messageContext, "filelocation");
-		Object filename = getParameter(messageContext, "file");
-		Object content = getParameter(messageContext, "content");
-		Object newFileName = getParameter(messageContext, "newfilename");
+		String fileLocation =
+		                      getParameter(messageContext, "filelocation") == null
+		                                                                          ? ""
+		                                                                          : getParameter(
+		                                                                                         messageContext,
+		                                                                                         "filelocation").toString();
+		String filename =
+		                  getParameter(messageContext, "file") == null
+		                                                              ? ""
+		                                                              : getParameter(
+		                                                                             messageContext,
+		                                                                             "file").toString();
+		String content =
+		                 getParameter(messageContext, "content") == null
+		                                                                ? ""
+		                                                                : getParameter(
+		                                                                               messageContext,
+		                                                                               "content").toString();
+		String newFileName =
+		                     getParameter(messageContext, "newfilename") == null
+		                                                                        ? ""
+		                                                                        : getParameter(
+		                                                                                       messageContext,
+		                                                                                       "newfilename").toString();
+
+		String filebeforepprocess =
+		                            getParameter(messageContext, "filebeforepprocess") == null
+		                                                                                      ? ""
+		                                                                                      : getParameter(
+		                                                                                                     messageContext,
+		                                                                                                     "filebeforepprocess").toString();
+
 		try {
 
 			System.out.println("File creation started..." + filename.toString());
@@ -56,6 +85,13 @@ public class FileRename extends AbstractConnector implements Connector {
 				                                                    newFileName.toString(),
 				                                            FTPSiteUtils.createDefaultOptions());
 				if (remoteFile.exists()) {
+					if (!filebeforepprocess.equals("")) {
+						FileObject fBeforeProcess =
+						                            manager.resolveFile(filebeforepprocess +
+						                                                filename);
+						fBeforeProcess.copyFrom(remoteFile, Selectors.SELECT_SELF);
+					}
+
 					remoteFile.moveTo(reNameFile);
 					ResultPayloadCreater resultPayload = new ResultPayloadCreater();
 					String responce = "<result>Suceess</result>";

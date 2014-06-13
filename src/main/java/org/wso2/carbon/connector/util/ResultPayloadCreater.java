@@ -2,7 +2,6 @@ package org.wso2.carbon.connector.util;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Iterator;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -19,14 +18,17 @@ public class ResultPayloadCreater {
 
 	public void preparePayload(MessageContext messageContext, OMElement element) {
 		SOAPBody soapBody = messageContext.getEnvelope().getBody();
-		for (Iterator itr = soapBody.getChildElements(); itr.hasNext();) {
-			OMElement child = (OMElement) itr.next();
-			child.detach();
-		}
-		for (Iterator itr = element.getChildElements(); itr.hasNext();) {
-			OMElement child = (OMElement) itr.next();
-			soapBody.addChild(child);
-		}
+		soapBody.addChild(element);
+		/*
+		 * for (Iterator itr = soapBody.getChildElements(); itr.hasNext();) {
+		 * OMElement child = (OMElement) itr.next();
+		 * child.detach();
+		 * }
+		 * for (Iterator itr = element.getChildElements(); itr.hasNext();) {
+		 * OMElement child = (OMElement) itr.next();
+		 * soapBody.addChild(child);
+		 * }
+		 */
 	}
 
 	public OMElement performSearchMessages(String output) throws XMLStreamException,

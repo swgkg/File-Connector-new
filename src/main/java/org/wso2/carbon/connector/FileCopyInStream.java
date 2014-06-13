@@ -32,6 +32,7 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAPBody;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs.FileObject;
@@ -75,6 +76,7 @@ public class FileCopyInStream extends AbstractConnector implements Connector {
 			log.info("File creation started..." + filename.toString());
 			log.info("File Location..." + fileLocation.toString());
 			log.info("File content..." + content.toString());
+
 			StandardFileSystemManager manager = new StandardFileSystemManager();
 			String sftpURL = newFileLocation + filename.toString();
 			FileSystemOptions opts = FTPSiteUtils.createDefaultOptions();
@@ -88,16 +90,18 @@ public class FileCopyInStream extends AbstractConnector implements Connector {
 			InputStream fin = localFile.getContent().getInputStream();
 			OutputStream fout = remoteFile.getContent().getOutputStream();
 
-			while (true) {
-				synchronized (buffer) {
-					int amountRead = fin.read(buffer);
-					if (amountRead == -1) {
-						break;
-					}
-					fout.write(buffer, 0, amountRead);
-				}
-			}
-
+			IOUtils.copyLarge(fin, fout);
+			/*
+			 * while (true) {
+			 * synchronized (buffer) {
+			 * int amountRead = fin.read(buffer);
+			 * if (amountRead == -1) {
+			 * break;
+			 * }
+			 * fout.write(buffer, 0, amountRead);
+			 * }
+			 * }
+			 */
 			manager.close();
 			OMElement element = this.performSearchMessages();
 

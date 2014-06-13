@@ -46,6 +46,7 @@ public class FileArchives extends AbstractConnector implements Connector {
 			Collection<File> fileList = FileUtils.listFiles(inputDirectory, SUFFIX, true);
 			new FileCompressUtil().compressFiles(fileList, file, ArchiveType.ZIP);
 			System.out.println("File archived......");
+
 			// return dir;
 
 		} catch (Exception e) {

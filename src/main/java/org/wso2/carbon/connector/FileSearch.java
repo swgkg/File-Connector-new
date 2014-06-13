@@ -41,9 +41,19 @@ public class FileSearch extends AbstractConnector implements Connector {
 	private static Log log = LogFactory.getLog(FileSearch.class);
 
 	public void connect(MessageContext messageContext) throws ConnectException {
-		Object fileLocation = getParameter(messageContext, "filelocation");
-		Object filename = getParameter(messageContext, "file");
-		Object content = getParameter(messageContext, "content");
+		String fileLocation =
+		                      getParameter(messageContext, "filelocation") == null
+		                                                                          ? ""
+		                                                                          : getParameter(
+		                                                                                         messageContext,
+		                                                                                         "filelocation").toString();
+		String filename =
+		                  getParameter(messageContext, "file") == null
+		                                                              ? ""
+		                                                              : getParameter(
+		                                                                             messageContext,
+		                                                                             "file").toString();
+
 		String filepattern =
 		                     getParameter(messageContext, "filepattern") == null
 		                                                                        ? ""
@@ -56,24 +66,24 @@ public class FileSearch extends AbstractConnector implements Connector {
 		                                                                      : getParameter(
 		                                                                                     messageContext,
 		                                                                                     "dirpattern").toString();
-		Object ftpFileLocation = getParameter(messageContext, "ftpfilelocation");
+
 		try {
 
 			log.info("File creation started..." + filename.toString());
 			// System.out.println("File creation started..." +
 			// filename.toString());
 			log.info("File Location..." + fileLocation.toString());
-			log.info("File content..." + content.toString());
+			log.info("File content..." + filepattern.toString());
 
-			if (ftpFileLocation != null && !ftpFileLocation.toString().equals("")) {
+			if (!fileLocation.toString().equals("")) {
 
 				StandardFileSystemManager manager = new StandardFileSystemManager();
-				String sftpURL = ftpFileLocation.toString();
+
 				FileSystemOptions opts = FTPSiteUtils.createDefaultOptions();
 
 				manager.init();
 
-				FileObject remoteFile = manager.resolveFile(sftpURL, opts);
+				FileObject remoteFile = manager.resolveFile(fileLocation, opts);
 				FileObject[] children = remoteFile.getChildren();
 				final String FILE_PATTERN = filepattern;
 				final String DIR_PATTERN = dirpattern;

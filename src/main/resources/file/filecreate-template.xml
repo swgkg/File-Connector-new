@@ -3,6 +3,8 @@
      <parameter name="filelocation"/>
       <parameter name="content"/>
       <parameter name="ftpfilelocation"/>
+       <parameter name="contenttype"/>
+        <parameter name="encoding"/>
     <sequence>
         <log level="full">
             <property name="file" expression="$func:file" />  

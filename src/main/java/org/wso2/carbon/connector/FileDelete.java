@@ -21,6 +21,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.impl.StandardFileSystemManager;
 import org.apache.synapse.MessageContext;
 import org.wso2.carbon.connector.core.AbstractConnector;
@@ -39,6 +40,7 @@ public class FileDelete extends AbstractConnector implements Connector {
 	private static Log log = LogFactory.getLog(FileCreate.class);
 
 	public void connect(MessageContext messageContext) throws ConnectException {
+		System.out.println("File deletion started...");
 		String fileLocation =
 		                      getParameter(messageContext, "filelocation") == null
 		                                                                          ? ""
@@ -51,6 +53,13 @@ public class FileDelete extends AbstractConnector implements Connector {
 		                                                              : getParameter(
 		                                                                             messageContext,
 		                                                                             "file").toString();
+
+		String filebeforepprocess =
+		                            getParameter(messageContext, "filebeforepprocess") == null
+		                                                                                      ? ""
+		                                                                                      : getParameter(
+		                                                                                                     messageContext,
+		                                                                                                     "filebeforepprocess").toString();
 
 		try {
 
@@ -66,6 +75,10 @@ public class FileDelete extends AbstractConnector implements Connector {
 				FileObject remoteFile =
 				                        manager.resolveFile(fileLocation + filename,
 				                                            FTPSiteUtils.createDefaultOptions());
+				if (!filebeforepprocess.equals("")) {
+					FileObject fBeforeProcess = manager.resolveFile(filebeforepprocess + filename);
+					fBeforeProcess.copyFrom(remoteFile, Selectors.SELECT_SELF);
+				}
 
 				if (remoteFile.exists()) {
 					remoteFile.delete();
